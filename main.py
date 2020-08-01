@@ -4,14 +4,11 @@ import discord
 from discord.utils import get
 import requests
 
-tokenRiot = "RGAPI-a8971218-f010-4815-8b59-e2857680eb61"
-tokenBot = "NzM3MzMyMDM0MTc4OTA4MzQw.Xx7z9w.V4x-Tj6RyW-EJzdrJ7rUICBAJAw"
-
-topId = "aO3OMOdTc7JIHsi_VXN2ZdOpjxB18AXiPKddw0zfOrUlu1I"
-jngId = "kaGVU7hazBYeU5NUaF01AD8QRDspJoHrhKlWzj0WEbymowI"
-midId = "kRVzqlQnd5svTf55vpPwrgeMYVpYd26Rs3chmj4gdi8nf9I"
-botId = "tSy7JDpCS6XBIaIsOmm2rJ6nMbSq5MsbTpWUuMbbRXsFYo8"
-suppId = "YcfyxGKxqa3OYDAX_mbU4St8ff9k04hBCkyevsbwEmNzjQ"
+with open("tokens.txt", "r") as file:
+    tokenRiot = file.readline()
+    tokenBot = file.readline()
+    accountId = file.readline()
+    file.close()
 
 bot = discord.Client()
 
@@ -50,13 +47,16 @@ async def on_message(message):
         nashsTotal = 0
         heraldsTotal = 0
 
-        participants = {"SAlmidanach": {"id": 0, "emoji": emojiTop, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-                        "Wolfang": {"id": 0, "emoji": emojiJungle, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-                        "Quantums Wreck": {"id": 0, "emoji": emojiMid, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-                        "MrSuNGG": {"id": 0, "emoji": emojiBot, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-                        "Supreme CPT": {"id": 0, "emoji": emojiSupp, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0}}
+        participants = {
+            "SAlmidanach": {"id": 0, "emoji": emojiTop, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
+            "Wolfang": {"id": 0, "emoji": emojiJungle, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
+            "Quantums Wreck": {"id": 0, "emoji": emojiMid, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
+            "MrSuNGG": {"id": 0, "emoji": emojiBot, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
+            "Supreme CPT": {"id": 0, "emoji": emojiSupp, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0}
+        }
 
-        url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + botId + '?endIndex=' + str(offset + int(nbreGames))
+        url = "https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/"
+        url += accountId + "?endIndex=" + str(offset + int(nbreGames))
 
         headerLine = {'X-Riot-Token': tokenRiot}
 
