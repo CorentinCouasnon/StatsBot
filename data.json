@@ -1,0 +1,116 @@
+{
+    "SAlmidanach": {
+        "120": {
+            "nbreWins": 1,
+            "nbreGames": 1
+        },
+        "62": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "82": {
+            "nbreWins": 1,
+            "nbreGames": 3
+        },
+        "106": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "516": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "98": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        }
+    },
+    "Wolfang": {
+        "141": {
+            "nbreWins": 1,
+            "nbreGames": 2
+        },
+        "64": {
+            "nbreWins": 0,
+            "nbreGames": 2
+        },
+        "56": {
+            "nbreWins": 1,
+            "nbreGames": 2
+        },
+        "59": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "154": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        }
+    },
+    "Quantums Wreck": {
+        "84": {
+            "nbreWins": 1,
+            "nbreGames": 2
+        },
+        "3": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "245": {
+            "nbreWins": 1,
+            "nbreGames": 1
+        },
+        "69": {
+            "nbreWins": 0,
+            "nbreGames": 2
+        },
+        "39": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "157": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        }
+    },
+    "MrSuNGG": {
+        "67": {
+            "nbreWins": 1,
+            "nbreGames": 1
+        },
+        "81": {
+            "nbreWins": 1,
+            "nbreGames": 4
+        },
+        "236": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "96": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "145": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        }
+    },
+    "Supreme CPT": {
+        "350": {
+            "nbreWins": 2,
+            "nbreGames": 4
+        },
+        "432": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        },
+        "25": {
+            "nbreWins": 0,
+            "nbreGames": 2
+        },
+        "117": {
+            "nbreWins": 0,
+            "nbreGames": 1
+        }
+    }
+}
