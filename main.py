@@ -5,9 +5,9 @@ from discord.utils import get
 import requests
 
 with open("tokens.txt", "r") as file:
-    tokenRiot = file.readline()
-    tokenBot = file.readline()
-    accountId = file.readline()
+    tokenRiot = file.readline().replace("\n", "")
+    tokenBot = file.readline().replace("\n", "")
+    accountId = file.readline().replace("\n", "")
     file.close()
 
 bot = discord.Client()
