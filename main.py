@@ -147,14 +147,20 @@ async def on_message(message):
             msgResultatObjectifs += "Temps de jeu défaites : " + avgLoss + "\r\n\r\n"
             msgResultatObjectifs += "Tours détruites : " + towers + "\r\n"
             msgResultatObjectifs += "Inhib détruits : " + inhibs + "\r\n\r\n"
-            msgResultatObjectifs += "Drake tués : " + "{:.0%}".format(drakes / drakesTotal) + " (" + str(drakes) + ")\r\n"
-            msgResultatObjectifs += "Nash tués : " + "{:.0%}".format(nashs / nashsTotal) + " (" + str(nashs) + ")\r\n"
-            msgResultatObjectifs += "Herald tués : " + "{:.0%}".format(heralds / heraldsTotal) + " (" + str(heralds) + ")\r\n\r\n"
+            msgResultatObjectifs += "Drake tués : " + "{:.0%}".format(drakes / drakesTotal)
+            msgResultatObjectifs += " (" + str(drakes) + " sur " + str(drakesTotal) + ")\r\n"
+            msgResultatObjectifs += "Nash tués : " + "{:.0%}".format(nashs / nashsTotal)
+            msgResultatObjectifs += " (" + str(nashs) + " sur " + str(nashsTotal) + ")\r\n"
+            msgResultatObjectifs += "Herald tués : " + "{:.0%}".format(heralds / heraldsTotal)
+            msgResultatObjectifs += " (" + str(heralds) + " sur " + str(heraldsTotal) + ")\r\n\r\n"
             msgResultatObjectifs += "First blood : " + "{:.0%}".format(fb / int(nbreGames)) + "\r\n"
             msgResultatObjectifs += "First tower : " + "{:.0%}".format(ft / int(nbreGames)) + "\r\n"
             msgResultatObjectifs += "First drake : " + "{:.0%}".format(fd / int(nbreGames)) + "\r\n"
 
-            msgStatsKDA = "\r\nKills :\r\n"
+            msgStatsKDA = "\r\nKDA :\r\n"
+            for participant in participants:
+                msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + "\r\n"
+            msgStatsKDA += "\r\nKills :\r\n"
             for participant in participants:
                 msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames), 1)) + "\r\n"
             msgStatsKDA += "\r\nMorts :\r\n"
@@ -190,7 +196,7 @@ async def on_message(message):
         nbreGames = values[1]
         offset = 0 if len(values) < 3 else int(values[2])
 
-        url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + botId + '?endIndex=' + str(int(nbreGames) + offset)
+        url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + accountId + '?endIndex=' + str(int(nbreGames) + offset)
 
         headerLine = {'X-Riot-Token': tokenRiot}
 
@@ -288,7 +294,6 @@ async def on_message(message):
                     arr = sorted(arr, key=lambda x: x[2], reverse=True)
                     arr = [i for i in arr if i[2] >= 5]
                     arr = sorted(arr, key=lambda x: x[1] / x[2], reverse=True)
-
                 else:
                     arr = sorted(arr, key=lambda x: x[1], reverse=True)
                     arr = sorted(arr, key=lambda x: x[2], reverse=True)
@@ -302,7 +307,7 @@ async def on_message(message):
 
                     if emojiIcon is not None:
                         msg += f"{emojiIcon}" + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
-                    else :
+                    else:
                         msg += str(arr[i][0]) + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
 
                 if msg:
