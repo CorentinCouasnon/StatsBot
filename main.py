@@ -242,33 +242,32 @@ async def on_message(message):
                 msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + "\r\n"
             msgStats += "\r\nK ~ D ~ A :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames), 1)) + " ~ "
-                msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames), 1)) + " ~ "
-                msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames), 1)) + "\r\n"
-            msgStats += "\r\nGold :\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames))) + "/"
+                msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames))) + "/"
+                msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames))) + "\r\n"
+            msgStats += "\r\nKill participation :\r\n"
             for participant in participants:
-                gold = "%g" % (round(participants[participant]['gold'] / int(nbreGames)))
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(gold):,}'.replace(',', ' ') + "\r\n"
-            msgStats += "\r\nPentakills:\r\n"
+                totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
+            msgStats += "\r\nDégâts :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['penta'] / int(nbreGames))) + "\r\n"
+                damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
             msgMoreStats = "\r\nCS/mn :\r\n"
             for participant in participants:
                 msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
-            msgMoreStats += "\r\nVS ~ Kill ~ Placés ~ Pink :\r\n"
+            msgMoreStats += "\r\nGold :\r\n"
+            for participant in participants:
+                gold = "%g" % (round(participants[participant]['gold'] / int(nbreGames)))
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(gold):,}'.replace(',', ' ') + "\r\n"
+            msgMoreStats += "\r\nVision Score ~ Pink achetés :\r\n"
             for participant in participants:
                 msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + " ~ "
-                msgMoreStats += "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " ~ "
-                msgMoreStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + " ~ "
                 msgMoreStats += "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
-            msgMoreStats += "\r\nKill participation :\r\n"
+            msgMoreStats += "\r\nWards détruites ~ Wards placés :\r\n"
             for participant in participants:
-                totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
-            msgMoreStats += "\r\nDamage dealt aux champions :\r\n"
-            for participant in participants:
-                damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + "\r\n"
 
             embed = discord.Embed(title=titre, color=0x23e7e3)
             embed.add_field(name="RÉSULTAT & OBJECTIFS", value=msgResultatObjectifs, inline=True)
