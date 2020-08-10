@@ -239,13 +239,11 @@ async def on_message(message):
 
             msgStats = "\r\nKDA :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + "\r\n"
-            msgStats += "\r\nK ~ D ~ A :\r\n"
-            for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames))) + "/"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + " ("
+                msgStats += "%g" % (round(participants[participant]['kills'] / int(nbreGames))) + "/"
                 msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames))) + "/"
-                msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames))) + "\r\n"
-            msgStats += "\r\nKill participation :\r\n"
+                msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames))) + ")\r\n"
+            msgStats += "\r\nKP :\r\n"
             for participant in participants:
                 totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
                 msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
@@ -253,6 +251,9 @@ async def on_message(message):
             for participant in participants:
                 damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
                 msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
+            msgStats += "\r\nPentakills :\r\n"
+            for participant in participants:
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['penta'] / int(nbreGames))) + "\r\n"
             msgMoreStats = "\r\nCS/mn :\r\n"
             for participant in participants:
                 msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
