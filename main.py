@@ -46,13 +46,75 @@ async def on_message(message):
         drakesTotal = 0
         nashsTotal = 0
         heraldsTotal = 0
+        totalKillsEquipe = 0
 
         participants = {
-            "SAlmidanach": {"id": 0, "emoji": emojiTop, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-            "Wolfang": {"id": 0, "emoji": emojiJungle, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-            "Quantums Wreck": {"id": 0, "emoji": emojiMid, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-            "MrSuNGG": {"id": 0, "emoji": emojiBot, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0},
-            "Supreme CPT": {"id": 0, "emoji": emojiSupp, "kills": 0, "deaths": 0, "assists": 0, "cs": 0, "vs": 0, "pink": 0, "dmgChamp": 0}
+            "SAlmidanach": {
+                "id": 0,
+                "emoji": emojiTop,
+                "kills": 0,
+                "deaths": 0,
+                "assists": 0,
+                "cs": 0,
+                "vs": 0,
+                "wardPlaced": 0,
+                "wardDestroyed": 0,
+                "pink": 0,
+                "dmgChamp": 0
+            },
+            "Wolfang": {
+                "id": 0,
+                "emoji": emojiJungle,
+                "kills": 0,
+                "deaths": 0,
+                "assists": 0,
+                "cs": 0,
+                "vs": 0,
+                "wardPlaced": 0,
+                "wardDestroyed": 0,
+                "pink": 0,
+                "dmgChamp": 0
+            },
+            "Quantums Wreck": {
+                "id": 0,
+                "emoji": emojiMid,
+                "kills": 0,
+                "deaths": 0,
+                "assists": 0,
+                "cs": 0,
+                "vs": 0,
+                "wardPlaced": 0,
+                "wardDestroyed": 0,
+                "pink": 0,
+                "dmgChamp": 0
+            },
+            "MrSuNGG": {
+                "id": 0,
+                "emoji": emojiBot,
+                "kills": 0,
+                "deaths": 0,
+                "assists": 0,
+                "cs": 0,
+                "vs": 0,
+                "wardPlaced": 0,
+                "wardDestroyed": 0,
+                "pink": 0,
+                "dmgChamp": 0
+            },
+            "Supreme CPT": {
+                "id": 0,
+                "emoji": emojiSupp,
+                "kills": 0,
+                "deaths": 0,
+                "assists": 0,
+                "cs": 0,
+                "vs": 0,
+                "wardPlaced": 0,
+                "wardDestroyed": 0,
+                "pink": 0,
+                "dmgChamp": 0,
+                "totalHeal": 0
+            }
         }
 
         url = "https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/"
@@ -71,7 +133,6 @@ async def on_message(message):
 
             if offset != 0:
                 del gameIds[:offset]
-                print(len(gameIds))
 
             for i in gameIds:
                 url = 'https://euw1.api.riotgames.com/lol/match/v4/matches/' + str(i)
@@ -119,12 +180,18 @@ async def on_message(message):
 
                         if player:
                             player["kills"] += participant["stats"]["kills"]
+                            totalKillsEquipe += participant["stats"]["kills"]
                             player["deaths"] += participant["stats"]["deaths"]
                             player["assists"] += participant["stats"]["assists"]
                             player["cs"] += (participant["stats"]["totalMinionsKilled"] + participant["stats"]["neutralMinionsKilled"]) / (gameDuration / 60)
                             player["vs"] += participant["stats"]["visionScore"]
+                            player["wardPlaced"] += participant["stats"]["wardsPlaced"]
+                            player["wardDestroyed"] += participant["stats"]["wardsKilled"]
                             player["pink"] += participant["stats"]["visionWardsBoughtInGame"]
                             player["dmgChamp"] += participant["stats"]["totalDamageDealtToChampions"]
+
+                            if participants["Supreme CPT"]["id"] == participant["participantId"]:
+                                player["totalHeal"] += participant["stats"]["totalHeal"]
 
             avgGame = round(avgGame / int(nbreGames))
             avgWin = round(avgWin / winCounter) if winCounter != 0 else 0
@@ -138,7 +205,8 @@ async def on_message(message):
             inhibs = "%g" % (round(inhibs / int(nbreGames), 1))
 
             titre = "Statistiques d'une session de " + nbreGames + " partie(s) ! \r\n\r\n"
-            footer = "(MVP : Krantt)"
+            footer = "Supreme CPT a heal " + str(participants["Supreme CPT"]["totalHeal"]) + " points de dégats sur les "
+            footer += nbreGames + " parties !"
 
             msgResultatObjectifs = "Nombre de victoires : " + str(winCounter) + "\r\n"
             msgResultatObjectifs += "Nombre de défaites : " + str(lossCounter) + "\r\n\r\n"
@@ -172,12 +240,16 @@ async def on_message(message):
             msgStats = "\r\nCS/mn :\r\n"
             for participant in participants:
                 msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
-            msgStats += "\r\nVision score :\r\n"
+            msgStats += "\r\nVS - Détruites - Placés - Pink :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + "\r\n"
-            msgStats += "\r\nPink achetés :\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + " --- "
+                msgStats += "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " --- "
+                msgStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + " --- "
+                msgStats += "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
+            msgStats += "\r\nKill participation :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
+                totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
             msgStats += "\r\nDamage dealt aux champions :\r\n"
             for participant in participants:
                 damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
