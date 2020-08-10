@@ -55,6 +55,8 @@ async def on_message(message):
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
+                "gold": 0,
+                "penta": 0,
                 "cs": 0,
                 "vs": 0,
                 "wardPlaced": 0,
@@ -68,6 +70,8 @@ async def on_message(message):
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
+                "gold": 0,
+                "penta": 0,
                 "cs": 0,
                 "vs": 0,
                 "wardPlaced": 0,
@@ -81,6 +85,8 @@ async def on_message(message):
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
+                "gold": 0,
+                "penta": 0,
                 "cs": 0,
                 "vs": 0,
                 "wardPlaced": 0,
@@ -94,6 +100,8 @@ async def on_message(message):
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
+                "gold": 0,
+                "penta": 0,
                 "cs": 0,
                 "vs": 0,
                 "wardPlaced": 0,
@@ -107,6 +115,8 @@ async def on_message(message):
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
+                "gold": 0,
+                "penta": 0,
                 "cs": 0,
                 "vs": 0,
                 "wardPlaced": 0,
@@ -183,6 +193,8 @@ async def on_message(message):
                             totalKillsEquipe += participant["stats"]["kills"]
                             player["deaths"] += participant["stats"]["deaths"]
                             player["assists"] += participant["stats"]["assists"]
+                            player["gold"] += participant["stats"]["goldEarned"]
+                            player["penta"] += participant["stats"]["pentaKills"]
                             player["cs"] += (participant["stats"]["totalMinionsKilled"] + participant["stats"]["neutralMinionsKilled"]) / (gameDuration / 60)
                             player["vs"] += participant["stats"]["visionScore"]
                             player["wardPlaced"] += participant["stats"]["wardsPlaced"]
@@ -225,40 +237,43 @@ async def on_message(message):
             msgResultatObjectifs += "First tower : " + "{:.0%}".format(ft / int(nbreGames)) + "\r\n"
             msgResultatObjectifs += "First drake : " + "{:.0%}".format(fd / int(nbreGames)) + "\r\n"
 
-            msgStatsKDA = "\r\nKDA :\r\n"
+            msgStats = "\r\nKDA :\r\n"
             for participant in participants:
-                msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + "\r\n"
-            msgStatsKDA += "\r\nKills :\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + "\r\n"
+            msgStats += "\r\nK ~ D ~ A :\r\n"
             for participant in participants:
-                msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames), 1)) + "\r\n"
-            msgStatsKDA += "\r\nMorts :\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['kills'] / int(nbreGames), 1)) + " ~ "
+                msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames), 1)) + " ~ "
+                msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames), 1)) + "\r\n"
+            msgStats += "\r\nGold :\r\n"
             for participant in participants:
-                msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['deaths'] / int(nbreGames), 1)) + "\r\n"
-            msgStatsKDA += "\r\nAssists :\r\n"
+                gold = "%g" % (round(participants[participant]['gold'] / int(nbreGames)))
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(gold):,}'.replace(',', ' ') + "\r\n"
+            msgStats += "\r\nPentakills:\r\n"
             for participant in participants:
-                msgStatsKDA += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['assists'] / int(nbreGames), 1)) + "\r\n"
-            msgStats = "\r\nCS/mn :\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['penta'] / int(nbreGames))) + "\r\n"
+            msgMoreStats = "\r\nCS/mn :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
-            msgStats += "\r\nVS - Détruites - Placés - Pink :\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
+            msgMoreStats += "\r\nVS ~ Kill ~ Placés ~ Pink :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + " --- "
-                msgStats += "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " --- "
-                msgStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + " --- "
-                msgStats += "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
-            msgStats += "\r\nKill participation :\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
+            msgMoreStats += "\r\nKill participation :\r\n"
             for participant in participants:
                 totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
-            msgStats += "\r\nDamage dealt aux champions :\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
+            msgMoreStats += "\r\nDamage dealt aux champions :\r\n"
             for participant in participants:
                 damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
 
             embed = discord.Embed(title=titre, color=0x23e7e3)
             embed.add_field(name="RÉSULTAT & OBJECTIFS", value=msgResultatObjectifs, inline=True)
-            embed.add_field(name="STATS KDA", value=msgStatsKDA, inline=True)
             embed.add_field(name="STATS", value=msgStats, inline=True)
+            embed.add_field(name="TOUJOURS PLUS DE STATS", value=msgMoreStats, inline=True)
             embed.set_footer(text=footer)
 
             await message.channel.send(embed=embed)
