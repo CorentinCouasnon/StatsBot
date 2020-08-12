@@ -4,11 +4,11 @@ import discord
 from discord.utils import get
 import requests
 
-with open("tokens.txt", "r") as file:
-    tokenRiot = file.readline().replace("\n", "")
-    tokenBot = file.readline().replace("\n", "")
-    accountId = file.readline().replace("\n", "")
-    file.close()
+with open("tokens.json", "r") as json_file:
+    data = json.load(json_file)
+    tokenRiot = data["Riot"]
+    tokenBot = data["Discord"]
+    accountIds = [data["SAlmidanach"], data["Wolfang"], data["Quantums Wreck"], data["MrSuNGG"], data["Supreme CPT"]]
 
 bot = discord.Client()
 
@@ -128,7 +128,7 @@ async def on_message(message):
         }
 
         url = "https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/"
-        url += accountId + "?endIndex=" + str(offset + int(nbreGames))
+        url += accountIds[3] + "?endIndex=" + str(offset + int(nbreGames))
 
         headerLine = {'X-Riot-Token': tokenRiot}
 
@@ -161,7 +161,7 @@ async def on_message(message):
                     #    if participant["player"]["summonerName"] in participants.keys():
                     #        participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
 
-                    #Uncomment in case of custome games
+                    #Uncomment in case of custom games
                     if i == 4755704576:
                         participants["SAlmidanach"]["id"] = 1
                         participants["Wolfang"]["id"] = 2
@@ -299,88 +299,89 @@ async def on_message(message):
 
     elif message.content.startswith('!save'):
         values = message.content.split()
-        nbreGames = values[1]
-        offset = 0 if len(values) < 3 else int(values[2])
-
-        url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + accountId + '?endIndex=' + str(int(nbreGames) + offset)
+        queue = values[1]
 
         headerLine = {'X-Riot-Token': tokenRiot}
 
-        req = requests.get(url, headers=headerLine)
+        arr = []
 
-        if req.status_code != 200:
-            await message.channel.send('Went wrong! Code:' + str(req.status_code))
-        else:
-            data = {}
+        for i in range(0, 5):
+            url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + accountIds[i] + '?queue=' + str(queue)
+            req = requests.get(url, headers=headerLine)
 
-            with open('data.json') as json_file:
-                data = json.load(json_file)
+            if req.status_code != 200:
+                await message.channel.send('Went wrong! Code:' + str(req.status_code))
+            else:
+                arr.append(set())
 
-            with open('data_save.json', 'w') as json_file:
-                json.dump(data, json_file, indent=4)
+                for matches in req.json()["matches"]:
+                    arr[i].add(matches["gameId"])
 
-            gameIds = []
-            for matches in req.json()["matches"]:
-                gameIds.append(matches["gameId"])
+        gameIds = arr[0].intersection(arr[1], arr[2], arr[3], arr[4])
 
-            if offset != 0:
-                del gameIds[:offset]
+        if len(gameIds) > 95:
+            gameIds = gameIds[:94]
 
-            for i in gameIds:
-                url = 'https://euw1.api.riotgames.com/lol/match/v4/matches/' + str(i)
-                req = requests.get(url, headers=headerLine)
+        data = {
+            "SAlmidanach": {},
+            "Wolfang": {},
+            "Quantums Wreck": {},
+            "MrSuNGG": {},
+            "Supreme CPT": {}
+        }
 
-                if req.status_code != 200:
-                    await message.channel.send('Went wrong [2]! Code:' + str(req.status_code))
+        for i in gameIds:
+            url = 'https://euw1.api.riotgames.com/lol/match/v4/matches/' + str(i)
+            req = requests.get(url, headers=headerLine)
+
+            if req.status_code != 200:
+                await message.channel.send('Went wrong [2]! Code:' + str(req.status_code))
+            else:
+                participants = {
+                    "SAlmidanach": {"playerId": 0, "champId": 0},
+                    "Wolfang": {"playerId": 0, "champId": 0},
+                    "Quantums Wreck": {"playerId": 0, "champId": 0},
+                    "MrSuNGG": {"playerId": 0, "champId": 0},
+                    "Supreme CPT": {"playerId": 0, "champId": 0}}
+
+                win = False
+
+                for participant in req.json()["participantIdentities"]:
+                    if participant["player"]["summonerName"] in participants.keys():
+                        participants[participant["player"]["summonerName"]]["playerId"] = participant["participantId"]
+
+                if participants['MrSuNGG']['playerId'] < 6:
+                    teamId = 100
                 else:
-                    participants = {
-                        "SAlmidanach": {"playerId": 0, "champId": 0},
-                        "Wolfang": {"playerId": 0, "champId": 0},
-                        "Quantums Wreck": {"playerId": 0, "champId": 0},
-                        "MrSuNGG": {"playerId": 0, "champId": 0},
-                        "Supreme CPT": {"playerId": 0, "champId": 0}}
+                    teamId = 200
 
-                    win = False
+                for team in req.json()["teams"]:
+                    if team["teamId"] == teamId:
+                        win = True if team["win"] == "Win" else False
 
-                    for participant in req.json()["participantIdentities"]:
-                        if participant["player"]["summonerName"] in participants.keys():
-                            participants[participant["player"]["summonerName"]]["playerId"] = participant["participantId"]
+                for participant in req.json()["participants"]:
+                    player = next((item for item in list(participants.values()) if
+                                   item["playerId"] == participant["participantId"]), False)
 
-                    if participants['MrSuNGG']['playerId'] < 6:
-                        teamId = 100
+                    if player:
+                        player["champId"] = participant["championId"]
+
+                for participant in participants:
+                    if participants[participant]["champId"] in data[participant].keys():
+                        data[participant][participants[participant]["champId"]]["nbreWins"] += 1 if win else 0
+                        data[participant][participants[participant]["champId"]]["nbreGames"] += 1
                     else:
-                        teamId = 200
+                        newChampEntry = {participants[participant]["champId"]: {
+                            "nbreWins": 1 if win else 0,
+                            "nbreGames": 1
+                        }}
+                        data[participant].update(newChampEntry)
 
-                    for team in req.json()["teams"]:
-                        if team["teamId"] == teamId:
-                            win = True if team["win"] == "Win" else False
+        with open('data.json', 'w') as json_file:
+            json.dump(data, json_file, indent=4)
 
-                    for participant in req.json()["participants"]:
-                        player = next((item for item in list(participants.values()) if
-                                       item["playerId"] == participant["participantId"]), False)
-
-                        if player:
-                            player["champId"] = participant["championId"]
-
-                    with open('data.json') as json_file:
-                        data = json.load(json_file)
-
-                        for participant in participants:
-                            if str(participants[participant]["champId"]) in data[participant].keys():
-                                data[participant][str(participants[participant]["champId"])]["nbreWins"] += 1 if win else 0
-                                data[participant][str(participants[participant]["champId"])]["nbreGames"] += 1
-                            else:
-                                newChampEntry = {participants[participant]["champId"]: {
-                                    "nbreWins": 1 if win else 0,
-                                    "nbreGames": 1
-                                }}
-                                data[participant].update(newChampEntry)
-
-                    with open('data.json', 'w') as json_file:
-                        json.dump(data, json_file, indent=4)
-
-            embed = discord.Embed(title="Sauvegarde effectué !", color=0x1feadd)
-            await message.channel.send(embed=embed)
+        embed = discord.Embed(title="Sauvegarde effectué !", color=0x1feadd)
+        await message.channel.send(embed=embed)
 
     elif message.content.startswith('!champs'):
         with open('data.json') as json_file:
