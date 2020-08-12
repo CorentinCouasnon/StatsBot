@@ -385,10 +385,7 @@ async def on_message(message):
                         }}
                         data[participant].update(newChampEntry)
 
-        if "-wr" in message.content:
-            embed = discord.Embed(title="Queue : " + queue, color=0x1feadd)
-        else:
-            embed = discord.Embed(title="Queue : " + queue, color=0x1feadd)
+        embed = discord.Embed(title="Queue : " + queue + " (440: Flex, 450: ARAM, 700: Clash)", color=0x1feadd)
 
         for participant in data:
             arr = []
