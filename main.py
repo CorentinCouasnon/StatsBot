@@ -9,16 +9,12 @@ with open("tokens.json", "r") as json_file:
     tokenRiot = data["Riot"]
     tokenBot = data["Discord"]
     accountIds = [data["SAlmidanach"], data["Wolfang"], data["Quantums Wreck"], data["MrSuNGG"], data["Supreme CPT"]]
+    json_file.close()
 
 bot = discord.Client()
 
 @bot.event
 async def on_message(message):
-    emojiTop = get(message.guild.emojis, name="Top")
-    emojiJungle = get(message.guild.emojis, name="Jungle")
-    emojiMid = get(message.guild.emojis, name="Mid")
-    emojiBot = get(message.guild.emojis, name="Bot")
-    emojiSupp = get(message.guild.emojis, name="Supp")
 
     if message.author == bot.user:
         return
@@ -51,7 +47,7 @@ async def on_message(message):
         participants = {
             "SAlmidanach": {
                 "id": 0,
-                "emoji": emojiTop,
+                "emoji": get(bot.emojis, name="Top"),
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
@@ -66,7 +62,7 @@ async def on_message(message):
             },
             "Wolfang": {
                 "id": 0,
-                "emoji": emojiJungle,
+                "emoji": get(bot.emojis, name="Jungle"),
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
@@ -81,7 +77,7 @@ async def on_message(message):
             },
             "Quantums Wreck": {
                 "id": 0,
-                "emoji": emojiMid,
+                "emoji": get(bot.emojis, name="Mid"),
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
@@ -96,7 +92,7 @@ async def on_message(message):
             },
             "MrSuNGG": {
                 "id": 0,
-                "emoji": emojiBot,
+                "emoji": get(bot.emojis, name="Bot"),
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
@@ -111,7 +107,7 @@ async def on_message(message):
             },
             "Supreme CPT": {
                 "id": 0,
-                "emoji": emojiSupp,
+                "emoji": get(bot.emojis, name="Supp"),
                 "kills": 0,
                 "deaths": 0,
                 "assists": 0,
@@ -144,7 +140,7 @@ async def on_message(message):
             if offset != 0:
                 del gameIds[:offset]
 
-            #Insert games ID in case of custome games
+            # Insert games ID in case of custome games
             gameIds = [4755554519, 4755704576, 4755555267]
 
             for i in gameIds:
@@ -153,15 +149,15 @@ async def on_message(message):
 
                 if req.status_code != 200:
                     await message.channel.send('Went wrong [2]! Code:' + str(req.status_code))
-                else :
+                else:
                     gameDuration = req.json()["gameDuration"]
                     avgGame += gameDuration
 
-                    #for participant in req.json()["participantIdentities"]:
+                    # for participant in req.json()["participantIdentities"]:
                     #    if participant["player"]["summonerName"] in participants.keys():
                     #        participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
 
-                    #Uncomment in case of custom games
+                    # Uncomment in case of custom games
                     if i == 4755704576:
                         participants["SAlmidanach"]["id"] = 1
                         participants["Wolfang"]["id"] = 2
@@ -174,7 +170,6 @@ async def on_message(message):
                         participants["Quantums Wreck"]["id"] = 8
                         participants["MrSuNGG"]["id"] = 9
                         participants["Supreme CPT"]["id"] = 10
-
 
                     if participants['MrSuNGG']['id'] < 6:
                         teamId = 100
@@ -204,7 +199,8 @@ async def on_message(message):
                         heraldsTotal += team["riftHeraldKills"]
 
                     for participant in req.json()["participants"]:
-                        player = next((item for item in list(participants.values()) if item["id"] == participant["participantId"]), False)
+                        player = next((item for item in list(participants.values()) if
+                                       item["id"] == participant["participantId"]), False)
 
                         if player:
                             player["kills"] += participant["stats"]["kills"]
@@ -213,7 +209,8 @@ async def on_message(message):
                             player["assists"] += participant["stats"]["assists"]
                             player["gold"] += participant["stats"]["goldEarned"]
                             player["penta"] += participant["stats"]["pentaKills"]
-                            player["cs"] += (participant["stats"]["totalMinionsKilled"] + participant["stats"]["neutralMinionsKilled"]) / (gameDuration / 60)
+                            player["cs"] += (participant["stats"]["totalMinionsKilled"] + participant["stats"][
+                                "neutralMinionsKilled"]) / (gameDuration / 60)
                             player["vs"] += participant["stats"]["visionScore"]
                             player["wardPlaced"] += participant["stats"]["wardsPlaced"]
                             player["wardDestroyed"] += participant["stats"]["wardsKilled"]
@@ -235,7 +232,8 @@ async def on_message(message):
             inhibs = "%g" % (round(inhibs / int(nbreGames), 1))
 
             titre = "Statistiques d'une session de " + nbreGames + " partie(s) ! \r\n\r\n"
-            footer = "Supreme CPT a heal " + str(participants["Supreme CPT"]["totalHeal"]) + " points de dégats sur les "
+            footer = "Supreme CPT a heal " + str(
+                participants["Supreme CPT"]["totalHeal"]) + " points de dégats sur les "
             footer += nbreGames + " parties !"
 
             msgResultatObjectifs = "Nombre de victoires : " + str(winCounter) + "\r\n"
@@ -257,7 +255,9 @@ async def on_message(message):
 
             msgStats = "\r\nKDA :\r\n"
             for participant in participants:
-                kda = "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) if participants[participant]['deaths'] != 0 else "Perfect"
+                kda = "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) /
+                                    participants[participant]['deaths'], 1)) if participants[participant][
+                                                                                    'deaths'] != 0 else "Perfect"
                 msgStats += "    " + f"{participants[participant]['emoji']}  " + kda + " ("
                 msgStats += "%g" % (round(participants[participant]['kills'] / int(nbreGames))) + "/"
                 msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames))) + "/"
@@ -265,28 +265,35 @@ async def on_message(message):
             msgStats += "\r\nKP :\r\n"
             for participant in participants:
                 totalParticipation = participants[participant]['kills'] + participants[participant]['assists']
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(totalParticipation / totalKillsEquipe) + "\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "{:.0%}".format(
+                    totalParticipation / totalKillsEquipe) + "\r\n"
             msgStats += "\r\nDégâts :\r\n"
             for participant in participants:
                 damageDealt = "%g" % (round(participants[participant]['dmgChamp'] / int(nbreGames)))
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',', ' ') + "\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(damageDealt):,}'.replace(',',
+                                                                                                                 ' ') + "\r\n"
             msgStats += "\r\nPentakills :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['penta'] / int(nbreGames))) + "\r\n"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (
+                    round(participants[participant]['penta'] / int(nbreGames))) + "\r\n"
             msgMoreStats = "\r\nCS/mn :\r\n"
             for participant in participants:
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (
+                    round(participants[participant]['cs'] / int(nbreGames), 1)) + "\r\n"
             msgMoreStats += "\r\nGold :\r\n"
             for participant in participants:
                 gold = "%g" % (round(participants[participant]['gold'] / int(nbreGames)))
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(gold):,}'.replace(',', ' ') + "\r\n"
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + f'{int(gold):,}'.replace(',',
+                                                                                                              ' ') + "\r\n"
             msgMoreStats += "\r\nVision Score ~ Pink achetés :\r\n"
             for participant in participants:
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['vs'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (
+                    round(participants[participant]['vs'] / int(nbreGames))) + " ~ "
                 msgMoreStats += "%g" % (round(participants[participant]['pink'] / int(nbreGames), 1)) + "\r\n"
             msgMoreStats += "\r\nWards détruites ~ Wards placés :\r\n"
             for participant in participants:
-                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " ~ "
+                msgMoreStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (
+                    round(participants[participant]['wardDestroyed'] / int(nbreGames))) + " ~ "
                 msgMoreStats += "%g" % (round(participants[participant]['wardPlaced'] / int(nbreGames))) + "\r\n"
 
             embed = discord.Embed(title=titre, color=0x23e7e3)
@@ -306,7 +313,8 @@ async def on_message(message):
         arr = []
 
         for i in range(0, 5):
-            url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + accountIds[i] + '?queue=' + str(queue)
+            url = 'https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/' + accountIds[
+                i] + '?queue=' + str(queue)
             req = requests.get(url, headers=headerLine)
 
             if req.status_code != 200:
@@ -398,14 +406,16 @@ async def on_message(message):
             msg = ""
             for i in range(5 if len(arr) >= 5 else len(arr)):
                 if arr[i][0] < 10:
-                    emojiIcon = get(message.guild.emojis, name=str(arr[i][0]) + "_")
+                    emojiIcon = get(bot.emojis, name=str(arr[i][0]) + "_")
                 else:
-                    emojiIcon = get(message.guild.emojis, name=str(arr[i][0]))
+                    emojiIcon = get(bot.emojis, name=str(arr[i][0]))
 
                 if emojiIcon is not None:
-                    msg += f"{emojiIcon}" + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
+                    msg += f"{emojiIcon}" + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(
+                        arr[i][2]) + ")\r\n"
                 else:
-                    msg += str(arr[i][0]) + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
+                    msg += str(arr[i][0]) + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(
+                        arr[i][2]) + ")\r\n"
 
             if msg:
                 embed.add_field(name=participant, value=msg, inline=True)
@@ -414,5 +424,6 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
     return
+
 
 bot.run(tokenBot)
