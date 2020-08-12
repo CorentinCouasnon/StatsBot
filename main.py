@@ -144,6 +144,9 @@ async def on_message(message):
             if offset != 0:
                 del gameIds[:offset]
 
+            #Insert games ID in case of custome games
+            gameIds = [4755554519, 4755704576, 4755555267]
+
             for i in gameIds:
                 url = 'https://euw1.api.riotgames.com/lol/match/v4/matches/' + str(i)
                 req = requests.get(url, headers=headerLine)
@@ -154,9 +157,24 @@ async def on_message(message):
                     gameDuration = req.json()["gameDuration"]
                     avgGame += gameDuration
 
-                    for participant in req.json()["participantIdentities"]:
-                        if participant["player"]["summonerName"] in participants.keys():
-                            participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
+                    #for participant in req.json()["participantIdentities"]:
+                    #    if participant["player"]["summonerName"] in participants.keys():
+                    #        participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
+
+                    #Uncomment in case of custome games
+                    if i == 4755704576:
+                        participants["SAlmidanach"]["id"] = 1
+                        participants["Wolfang"]["id"] = 2
+                        participants["Quantums Wreck"]["id"] = 3
+                        participants["MrSuNGG"]["id"] = 4
+                        participants["Supreme CPT"]["id"] = 5
+                    else:
+                        participants["SAlmidanach"]["id"] = 6
+                        participants["Wolfang"]["id"] = 7
+                        participants["Quantums Wreck"]["id"] = 8
+                        participants["MrSuNGG"]["id"] = 9
+                        participants["Supreme CPT"]["id"] = 10
+
 
                     if participants['MrSuNGG']['id'] < 6:
                         teamId = 100
@@ -239,7 +257,8 @@ async def on_message(message):
 
             msgStats = "\r\nKDA :\r\n"
             for participant in participants:
-                msgStats += "    " + f"{participants[participant]['emoji']}  " + "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) + " ("
+                kda = "%g" % (round((participants[participant]['kills'] + participants[participant]['assists']) / participants[participant]['deaths'], 1)) if participants[participant]['deaths'] != 0 else "Perfect"
+                msgStats += "    " + f"{participants[participant]['emoji']}  " + kda + " ("
                 msgStats += "%g" % (round(participants[participant]['kills'] / int(nbreGames))) + "/"
                 msgStats += "%g" % (round(participants[participant]['deaths'] / int(nbreGames))) + "/"
                 msgStats += "%g" % (round(participants[participant]['assists'] / int(nbreGames))) + ")\r\n"
