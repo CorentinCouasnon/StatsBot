@@ -417,7 +417,16 @@ async def on_message(message):
             if msg:
                 embed.add_field(name=participant, value=msg, inline=True)
 
-        embed.add_field(name="GG", value="WP", inline=True)
+        nbreWinsTotal = 0
+        nbreGamesTotal = 0
+
+        for key in data["MrSuNGG"].keys():
+            nbreWinsTotal += data["MrSuNGG"][key]["nbreWins"]
+            nbreGamesTotal += data["MrSuNGG"][key]["nbreGames"]
+
+        wrGeneral = "{:.0%}".format(nbreWinsTotal / nbreGamesTotal)
+
+        embed.add_field(name="Winrate général:", value=wrGeneral + " (" + str(nbreGamesTotal) + ")", inline=True)
         await message.channel.send(embed=embed)
 
     return
