@@ -297,7 +297,7 @@ async def on_message(message):
 
             await message.channel.send(embed=embed)
 
-    elif message.content.startswith('!save'):
+    elif message.content.startswith('!champs'):
         values = message.content.split()
         queue = values[1]
 
@@ -377,48 +377,38 @@ async def on_message(message):
                         }}
                         data[participant].update(newChampEntry)
 
-        with open('data.json', 'w') as json_file:
-            json.dump(data, json_file, indent=4)
+        if "-wr" in message.content:
+            embed = discord.Embed(title="Queue : " + queue, color=0x1feadd)
+        else:
+            embed = discord.Embed(title="Queue : " + queue, color=0x1feadd)
 
-        embed = discord.Embed(title="Sauvegarde effectué !", color=0x1feadd)
-        await message.channel.send(embed=embed)
-
-    elif message.content.startswith('!champs'):
-        with open('data.json') as json_file:
-            data = json.load(json_file)
+        for participant in data:
+            arr = []
+            for key in data[participant]:
+                arr.append([key, data[participant][key]["nbreWins"], data[participant][key]["nbreGames"]])
 
             if "-wr" in message.content:
-                embed = discord.Embed(title="Winrate ! (minimum 5 parties jouées)", color=0x1feadd)
+                arr = sorted(arr, key=lambda x: x[2], reverse=True)
+                arr = [i for i in arr if i[2] >= 5]
+                arr = sorted(arr, key=lambda x: x[1] / x[2], reverse=True)
             else:
-                embed = discord.Embed(title="Winrate - Trier par nombre de parties jouées !", color=0x1feadd)
+                arr = sorted(arr, key=lambda x: x[1], reverse=True)
+                arr = sorted(arr, key=lambda x: x[2], reverse=True)
 
-            for participant in data:
-                arr = []
-                for key in data[participant]:
-                    arr.append([key, data[participant][key]["nbreWins"], data[participant][key]["nbreGames"]])
-
-                if "-wr" in message.content:
-                    arr = sorted(arr, key=lambda x: x[2], reverse=True)
-                    arr = [i for i in arr if i[2] >= 5]
-                    arr = sorted(arr, key=lambda x: x[1] / x[2], reverse=True)
+            msg = ""
+            for i in range(5 if len(arr) >= 5 else len(arr)):
+                if arr[i][0] < 10:
+                    emojiIcon = get(message.guild.emojis, name=str(arr[i][0]) + "_")
                 else:
-                    arr = sorted(arr, key=lambda x: x[1], reverse=True)
-                    arr = sorted(arr, key=lambda x: x[2], reverse=True)
+                    emojiIcon = get(message.guild.emojis, name=str(arr[i][0]))
 
-                msg = ""
-                for i in range(5 if len(arr) >= 5 else len(arr)):
-                    if len(arr[i][0]) < 2:
-                        emojiIcon = get(message.guild.emojis, name=str(arr[i][0]) + "_")
-                    else:
-                        emojiIcon = get(message.guild.emojis, name=str(arr[i][0]))
+                if emojiIcon is not None:
+                    msg += f"{emojiIcon}" + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
+                else:
+                    msg += str(arr[i][0]) + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
 
-                    if emojiIcon is not None:
-                        msg += f"{emojiIcon}" + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
-                    else:
-                        msg += str(arr[i][0]) + " " + "{:.0%}".format(arr[i][1] / arr[i][2]) + " (" + str(arr[i][2]) + ")\r\n"
-
-                if msg:
-                    embed.add_field(name=participant, value=msg, inline=True)
+            if msg:
+                embed.add_field(name=participant, value=msg, inline=True)
 
         embed.add_field(name="GG", value="WP", inline=True)
         await message.channel.send(embed=embed)
