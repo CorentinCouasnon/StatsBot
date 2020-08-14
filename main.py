@@ -8,14 +8,19 @@ with open("tokens.json", "r") as json_file:
     data = json.load(json_file)
     tokenRiot = data["Riot"]
     tokenBot = data["Discord"]
-    accountIds = [data["SAlmidanach"], data["Wolfang"], data["Quantums Wreck"], data["MrSuNGG"], data["Supreme CPT"]]
+    accountIds = [data["toplaner"]["id"], data["jungler"]["id"], data["midlaner"]["id"], data["botlaner"]["id"], data["support"]["id"]]
+    toplaner = data["toplaner"]["summonerName"]
+    jungler = data["jungler"]["summonerName"]
+    midlaner = data["midlaner"]["summonerName"]
+    botlaner = data["botlaner"]["summonerName"]
+    support = data["support"]["summonerName"]
     json_file.close()
 
 bot = discord.Client()
 
+
 @bot.event
 async def on_message(message):
-
     if message.author == bot.user:
         return
 
@@ -45,7 +50,7 @@ async def on_message(message):
         totalKillsEquipe = 0
 
         participants = {
-            "SAlmidanach": {
+            toplaner: {
                 "id": 0,
                 "emoji": get(bot.emojis, name="Top"),
                 "kills": 0,
@@ -60,7 +65,7 @@ async def on_message(message):
                 "pink": 0,
                 "dmgChamp": 0
             },
-            "Wolfang": {
+            jungler: {
                 "id": 0,
                 "emoji": get(bot.emojis, name="Jungle"),
                 "kills": 0,
@@ -75,7 +80,7 @@ async def on_message(message):
                 "pink": 0,
                 "dmgChamp": 0
             },
-            "Quantums Wreck": {
+            midlaner: {
                 "id": 0,
                 "emoji": get(bot.emojis, name="Mid"),
                 "kills": 0,
@@ -90,7 +95,7 @@ async def on_message(message):
                 "pink": 0,
                 "dmgChamp": 0
             },
-            "MrSuNGG": {
+            botlaner: {
                 "id": 0,
                 "emoji": get(bot.emojis, name="Bot"),
                 "kills": 0,
@@ -105,7 +110,7 @@ async def on_message(message):
                 "pink": 0,
                 "dmgChamp": 0
             },
-            "Supreme CPT": {
+            support: {
                 "id": 0,
                 "emoji": get(bot.emojis, name="Supp"),
                 "kills": 0,
@@ -141,7 +146,7 @@ async def on_message(message):
                 del gameIds[:offset]
 
             # Insert games ID in case of custome games
-            gameIds = [4755554519, 4755704576, 4755555267]
+            # gameIds = [4755554519, 4755704576, 4755555267]
 
             for i in gameIds:
                 url = 'https://euw1.api.riotgames.com/lol/match/v4/matches/' + str(i)
@@ -153,25 +158,25 @@ async def on_message(message):
                     gameDuration = req.json()["gameDuration"]
                     avgGame += gameDuration
 
-                    # for participant in req.json()["participantIdentities"]:
-                    #    if participant["player"]["summonerName"] in participants.keys():
-                    #        participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
+                    for participant in req.json()["participantIdentities"]:
+                        if participant["player"]["summonerName"] in participants.keys():
+                            participants[participant["player"]["summonerName"]]["id"] = participant["participantId"]
 
                     # Uncomment in case of custom games
-                    if i == 4755704576:
-                        participants["SAlmidanach"]["id"] = 1
-                        participants["Wolfang"]["id"] = 2
-                        participants["Quantums Wreck"]["id"] = 3
-                        participants["MrSuNGG"]["id"] = 4
-                        participants["Supreme CPT"]["id"] = 5
-                    else:
-                        participants["SAlmidanach"]["id"] = 6
-                        participants["Wolfang"]["id"] = 7
-                        participants["Quantums Wreck"]["id"] = 8
-                        participants["MrSuNGG"]["id"] = 9
-                        participants["Supreme CPT"]["id"] = 10
+                    # if i == 4755704576:
+                    #    participants[toplaner]["id"] = 1
+                    #    participants[jungler]["id"] = 2
+                    #    participants[midlaner]["id"] = 3
+                    #    participants[botlaner]["id"] = 4
+                    #    participants[support]["id"] = 5
+                    # else:
+                    #    participants[toplaner]["id"] = 6
+                    #    participants[jungler]["id"] = 7
+                    #    participants[midlaner]["id"] = 8
+                    #    participants[botlaner]["id"] = 9
+                    #    participants[support]["id"] = 10
 
-                    if participants['MrSuNGG']['id'] < 6:
+                    if participants[botlaner]['id'] < 6:
                         teamId = 100
                     else:
                         teamId = 200
@@ -217,7 +222,7 @@ async def on_message(message):
                             player["pink"] += participant["stats"]["visionWardsBoughtInGame"]
                             player["dmgChamp"] += participant["stats"]["totalDamageDealtToChampions"]
 
-                            if participants["Supreme CPT"]["id"] == participant["participantId"]:
+                            if participants[support]["id"] == participant["participantId"]:
                                 player["totalHeal"] += participant["stats"]["totalHeal"]
 
             avgGame = round(avgGame / int(nbreGames))
@@ -232,8 +237,8 @@ async def on_message(message):
             inhibs = "%g" % (round(inhibs / int(nbreGames), 1))
 
             titre = "Statistiques d'une session de " + nbreGames + " partie(s) ! \r\n\r\n"
-            footer = "Supreme CPT a heal " + str(
-                participants["Supreme CPT"]["totalHeal"]) + " points de dégats sur les "
+            footer = support + " a heal " + str(
+                participants[support]["totalHeal"]) + " points de dégats sur les "
             footer += nbreGames + " parties !"
 
             msgResultatObjectifs = "Nombre de victoires : " + str(winCounter) + "\r\n"
@@ -331,11 +336,11 @@ async def on_message(message):
             gameIds = gameIds[:94]
 
         data = {
-            "SAlmidanach": {},
-            "Wolfang": {},
-            "Quantums Wreck": {},
-            "MrSuNGG": {},
-            "Supreme CPT": {}
+            toplaner: {},
+            jungler: {},
+            midlaner: {},
+            botlaner: {},
+            support: {}
         }
 
         for i in gameIds:
@@ -346,11 +351,11 @@ async def on_message(message):
                 await message.channel.send('Went wrong [2]! Code:' + str(req.status_code))
             else:
                 participants = {
-                    "SAlmidanach": {"playerId": 0, "champId": 0},
-                    "Wolfang": {"playerId": 0, "champId": 0},
-                    "Quantums Wreck": {"playerId": 0, "champId": 0},
-                    "MrSuNGG": {"playerId": 0, "champId": 0},
-                    "Supreme CPT": {"playerId": 0, "champId": 0}}
+                    toplaner: {"playerId": 0, "champId": 0},
+                    jungler: {"playerId": 0, "champId": 0},
+                    midlaner: {"playerId": 0, "champId": 0},
+                    botlaner: {"playerId": 0, "champId": 0},
+                    support: {"playerId": 0, "champId": 0}}
 
                 win = False
 
@@ -358,7 +363,7 @@ async def on_message(message):
                     if participant["player"]["summonerName"] in participants.keys():
                         participants[participant["player"]["summonerName"]]["playerId"] = participant["participantId"]
 
-                if participants['MrSuNGG']['playerId'] < 6:
+                if participants[botlaner]['playerId'] < 6:
                     teamId = 100
                 else:
                     teamId = 200
@@ -401,7 +406,7 @@ async def on_message(message):
                 arr = sorted(arr, key=lambda x: x[2], reverse=True)
 
             msg = ""
-            for i in range(5 if len(arr) >= 5 else len(arr)):
+            for i in range(10 if len(arr) >= 10 else len(arr)):
                 if arr[i][0] < 10:
                     emojiIcon = get(bot.emojis, name=str(arr[i][0]) + "_")
                 else:
@@ -420,9 +425,9 @@ async def on_message(message):
         nbreWinsTotal = 0
         nbreGamesTotal = 0
 
-        for key in data["MrSuNGG"].keys():
-            nbreWinsTotal += data["MrSuNGG"][key]["nbreWins"]
-            nbreGamesTotal += data["MrSuNGG"][key]["nbreGames"]
+        for key in data[botlaner].keys():
+            nbreWinsTotal += data[botlaner][key]["nbreWins"]
+            nbreGamesTotal += data[botlaner][key]["nbreGames"]
 
         wrGeneral = "{:.0%}".format(nbreWinsTotal / nbreGamesTotal)
 
