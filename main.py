@@ -18,6 +18,7 @@ with open("tokens.json", "r") as json_file:
 
 bot = discord.Client()
 
+headerLine = {'X-Riot-Token': tokenRiot}
 
 @bot.event
 async def on_message(message):
@@ -130,8 +131,6 @@ async def on_message(message):
 
         url = "https://euw1.api.riotgames.com/lol/match/v4/matchlists/by-account/"
         url += accountIds[3] + "?endIndex=" + str(offset + int(nbreGames))
-
-        headerLine = {'X-Riot-Token': tokenRiot}
 
         req = requests.get(url, headers=headerLine)
 
@@ -313,8 +312,6 @@ async def on_message(message):
         values = message.content.split()
         queue = values[1]
 
-        headerLine = {'X-Riot-Token': tokenRiot}
-
         arr = []
 
         for i in range(0, 5):
@@ -323,7 +320,7 @@ async def on_message(message):
             req = requests.get(url, headers=headerLine)
 
             if req.status_code != 200:
-                await message.channel.send('Went wrong! Code:' + str(req.status_code))
+                await message.channel.send('Went wrong! Code:' + str(req.status_code) + ". Message: " + req.json()["status"]["message"])
             else:
                 arr.append(set())
 
@@ -434,7 +431,65 @@ async def on_message(message):
         embed.add_field(name="Winrate général:", value=wrGeneral + " (" + str(nbreGamesTotal) + ")", inline=True)
         await message.channel.send(embed=embed)
 
-    return
+    elif message.content.startswith('!team'):
+        values = message.content.split()
 
+        if len(values) == 6:
+            with open("tokens.json", "r") as json_file:
+                data = json.load(json_file)
+
+            for i in range(1, 6):
+                url = 'https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/' + values[i]
+                req = requests.get(url, headers=headerLine)
+
+                if req.status_code != 200:
+                    await message.channel.send('Went wrong! Code:' + str(req.status_code))
+                else:
+                    if i == 1:
+                        data["toplaner"]["id"] = req.json()["accountId"]
+                        data["toplaner"]["summonerName"] = req.json()["name"]
+                    elif i == 2:
+                        data["jungler"]["id"] = req.json()["accountId"]
+                        data["jungler"]["summonerName"] = req.json()["name"]
+                    elif i == 3:
+                        data["midlaner"]["id"] = req.json()["accountId"]
+                        data["midlaner"]["summonerName"] = req.json()["name"]
+                    elif i == 4:
+                        data["botlaner"]["id"] = req.json()["accountId"]
+                        data["botlaner"]["summonerName"] = req.json()["name"]
+                    else:
+                        data["support"]["id"] = req.json()["accountId"]
+                        data["support"]["summonerName"] = req.json()["name"]
+
+            with open("tokens.json", "w") as json_file:
+                json.dump(data, json_file, indent=4)
+                json_file.close()
+
+            await message.channel.send('Fait !')
+
+        elif "-base" in message.content:
+            with open("tokens.json", "r") as json_file:
+                data = json.load(json_file)
+
+            data["toplaner"]["id"] = "kLunZ5XPnnnnqqlyaWESFtGu8MxsWNxydEyHG4BrC1hi5VI"
+            data["toplaner"]["summonerName"] = "SAlmidanach"
+            data["jungler"]["id"] = "bpuluOERRbgLG4HRq82PHasOMq9wZhXd0aspy00Vl6VUdEI"
+            data["jungler"]["summonerName"] = "Wolfang"
+            data["midlaner"]["id"] = "USU5qVMDUK-E_bopa5qvJX56WWa7Z76TFC_O2APwriLp8ko"
+            data["midlaner"]["summonerName"] = "Quantums Wreck"
+            data["botlaner"]["id"] = "NqDa9eKyuzPP2i7ttqjLji-jAnQ4STI-rAFWv2Li3-qrf4Y"
+            data["botlaner"]["summonerName"] = "MrSuNGG"
+            data["support"]["id"] = "RTjnyoR3D3Vvy46KqspGJCC6iqGl4x58maGtjDd580RsmA"
+            data["support"]["summonerName"] = "Supreme CPT"
+
+            with open("tokens.json", "w") as json_file:
+                json.dump(data, json_file, indent=4)
+                json_file.close()
+
+            await message.channel.send('Fait !')
+
+        else:
+            await message.channel.send('Invalid command')
+    return
 
 bot.run(tokenBot)
