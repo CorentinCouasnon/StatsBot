@@ -478,7 +478,7 @@ async def on_message(message):
             data["midlaner"]["id"] = "USU5qVMDUK-E_bopa5qvJX56WWa7Z76TFC_O2APwriLp8ko"
             data["midlaner"]["summonerName"] = "Quantums Wreck"
             data["botlaner"]["id"] = "NqDa9eKyuzPP2i7ttqjLji-jAnQ4STI-rAFWv2Li3-qrf4Y"
-            data["botlaner"]["summonerName"] = "MrSuNGG"
+            data["botlaner"]["summonerName"] = "Krantt"
             data["support"]["id"] = "RTjnyoR3D3Vvy46KqspGJCC6iqGl4x58maGtjDd580RsmA"
             data["support"]["summonerName"] = "Supreme CPT"
 
